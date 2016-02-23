@@ -9,18 +9,17 @@ class Logs(object):
     def __init__(self, host="localhost"):
         self.host = host
     
-    def __call__(self, func):
-        
-        def _wraper(*args, **kwargs):
-            
+    def __call__(self, func):        
+        def _wraper(*args, **kwargs):            
             try:
                 kwargs["conn"] = pika.BlockingConnection(pika.ConnectionParameters(host=self.host))
             
                 func(*args, **kwargs)
             finally:
-                kwargs["conn"].close()
-                
+                kwargs["conn"].close()                
         return _wraper
+    
+    
 @Logs()           
 def send(*args, **kwargs):
     
@@ -35,6 +34,7 @@ def send(*args, **kwargs):
     channel.basic_publish(exchange="logs", routing_key="", body=msg)
     
     print "[x] sent: %s"%msg
+
 
 if __name__ == "__main__":
     
