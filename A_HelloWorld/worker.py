@@ -1,3 +1,4 @@
+#encoding: utf-8
 '''
 Created on Feb 22, 2016
 
@@ -25,6 +26,10 @@ def callback(ch, method, properties, body):
 
 #channel.basic_qos(prefetch_count=1)
 
-channel.basic_consume(callback, queue='hello')  
+channel.basic_consume(
+    callback,
+    queue='hello'
+    #no_ack=True, 需不需要ack在从队列里取消息的时候指定，是否需要还是取绝于是否相信callback
+)  
   
 channel.start_consuming()  
