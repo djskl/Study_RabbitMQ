@@ -24,6 +24,7 @@ CONST.TTYPES = ["abc", "def", "ghi"]
 CONST.TASK_EXH = "tasks"
 CONST.TASK_QUE = "tasks"
 
+CONST.STAT_EXH = "stats"
 CONST.STAT_QUE = "stats"
 
 import sys

@@ -5,15 +5,9 @@ Created on Apr 3, 2016
 @author: root
 '''
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 ALL_TASKS = {}
-    
-class TaskMeta(type):
-    def __new__(self, *args, **kwargs):
-        clz = super(TaskMeta, self).__new__(self, *args, **kwargs)
-        ALL_TASKS[clz.task_type] = clz
-        return clz    
 
 class TaskInfo(object):
     
@@ -37,6 +31,11 @@ class TaskInfo(object):
             "result": self.result
         })
 
+class TaskMeta(type):
+    def __new__(self, *args, **kwargs):
+        clz = super(TaskMeta, self).__new__(self, *args, **kwargs)
+        ALL_TASKS[clz.task_type] = clz
+        return clz
 
 class BaseTask(object):
     
@@ -46,37 +45,25 @@ class BaseTask(object):
         self.report_taskinfo = func    
         
     def do(self, taskid, **kwargs):
-        raise NotImplementedError()
+        
+        taskInfo = TaskInfo(taskid = taskid, stime = datetime.now())
+        
+        self.report_taskinfo(taskInfo)
+        
+        print json.dumps(kwargs)
+        
+        taskInfo.etime = datetime.now() + timedelta(hours=1)
+        taskInfo.result = "hello, world"
+        self.report_taskinfo(taskInfo)
+        
         
 class A(BaseTask):
-    
     __metaclass__ = TaskMeta
-    
     task_type = "abc"
     
-    def do(self, taskid, **kwargs):
-        
-        taskInfo = TaskInfo(taskid = taskid, stime = datetime.now())
-        
-        self.report_taskinfo(taskInfo)
-        
-        with open("%s_abc.txt"%taskid, "w") as writer:
-            writer.write(json.dumps(kwargs))
-
 
 class B(BaseTask):
-    
     __metaclass__ = TaskMeta
-    
     task_type = "def"
-    
-    def do(self, taskid, **kwargs):
-        
-        taskInfo = TaskInfo(taskid = taskid, stime = datetime.now())
-        
-        self.report_taskinfo(taskInfo)
-        
-        with open("%s_def.txt"%taskid, "w") as writer:
-            writer.write(json.dumps(kwargs))
     
     

@@ -8,7 +8,7 @@ import json
 from pika import BasicProperties
 from tasks import ALL_TASKS, TaskInfo
 from utils import create_basic_channel
-from constants import TTYPES, TASK_EXH, TASK_QUE, STAT_QUE
+from constants import TTYPES, TASK_EXH, TASK_QUE, STAT_EXH, STAT_QUE
 
 '''
 负责任务的接受与状态汇报

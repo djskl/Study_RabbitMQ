@@ -6,7 +6,7 @@ Created on Apr 2, 2016
 '''
 import json
 from pika import BasicProperties
-from utils import create_basic_channel
+from utils import create_basic_channel, async_call
 from constants import TASK_EXH, TASK_QUE, STAT_QUE
 
 class TaskClient(object):
@@ -19,14 +19,22 @@ class TaskClient(object):
         self.chan.queue_declare(queue=TASK_QUE, durable=True)
     
         self.chan.queue_declare(queue=STAT_QUE, durable=True)
+        self.chan.basic_consume(self.on_response, queue=STAT_QUE)
+        async_call(self.chan.start_consuming)
         
+    def on_response(self, ch, method, props, body):
+        print props.correlation_id
+        print body
         
-    def submit(self, task_id, task_type, task_params): 
+        taskinfo = json.loads(body)
         
-        self.result = None
-        def on_response(ch, method, props, body):
-            if task_id == props.correlation_id:
-                self.result = json.loads(body)
+        if taskinfo["result"]:
+            ch.stop_consuming()
+            
+        ch.basic_ack(delivery_tag = method.delivery_tag)
+        
+    
+    def submit(self, task_id, task_type, task_params):
         
         self.chan.queue_bind(queue=TASK_QUE, exchange=TASK_EXH, routing_key=task_type)
         
@@ -38,17 +46,10 @@ class TaskClient(object):
                            }),
                            properties=BasicProperties(
                                 delivery_mode = 2,
-                                reply_to = STAT_QUE,
                                 correlation_id = task_id
                            ))
         
-        self.chan.basic_consume(on_response, no_ack=True, queue=STAT_QUE)
-        
-        while self.result is None:
-            print "等待结果。。。"
-            self.conn.process_data_events()
-         
-        return self.result 
+        return True
         
 if __name__ == "__main__":
     
