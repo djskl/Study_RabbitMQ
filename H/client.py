@@ -14,7 +14,6 @@ class MyClient(object):
         self.chan = self.conn.channel()
     
     def handler(self, ch, method, props, body):
-        print body
         ch.basic_ack(delivery_tag = method.delivery_tag)
         ch.stop_consuming()
         
@@ -38,9 +37,10 @@ class MyClient(object):
 
 if __name__ == "__main__":
     mc = MyClient()
-    msgs = ["hello", "world", "zxh", "1988"]
-    for msg in msgs:
-        mc.reverse(msg)
+    
+    mc.reverse("45679")
+    
+    mc.reverse("123")
     
     
     

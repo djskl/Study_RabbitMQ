@@ -1,6 +1,7 @@
 #encoding: utf-8
 from pika import BlockingConnection, ConnectionParameters
 from pika import BasicProperties
+from time import sleep
 
 class MyServer(object):
     
@@ -10,6 +11,9 @@ class MyServer(object):
         
     def handler(self, ch, method, props, body):
         print body
+        
+        nums = len(body)
+        sleep(nums)
         
         ch.queue_declare(queue="response", durable=True)
         ch.basic_publish(
